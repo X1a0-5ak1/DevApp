@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+  front:
+    build:
+      context: ./front
+      args:
+        - FRONT_WORKDIR=/workspace/front
+    tty: true
+    stdin_open: true
+    volumes:
+      - .:/workspace
+      - front_store:/workspace/front/$FRONT_PROJ_NAME/node_modules
+    ports:
+      - "5173:5173"
+    # docker-compose起動時コマンド。プロジェクトディレクトリがある場合はアプリを起動し、ない場合はメッセージを出して待機
+    command: >
+      sh -c 
+        "if [ -e $FRONT_PROJ_NAME/package.json ]; then 
+          cd $FRONT_PROJ_NAME && yarn install && yarn dev --host
+        else
+          echo 'Project Directory is not found...' && tail -f /dev/null
+        fi"
+
+  api:
+    build:
+      context: ./api
+      args:
+        - API_WORKDIR=/workspace/api
+    tty: true
+    stdin_open: true
+    volumes:
+      - .:/workspace
+      - api_store:/workspace/api/$API_PROJ_NAME/node_modules
+    ports:
+      - "3000:3000"
+      - "5555:5555"
+    # docker-compose起動時コマンド。プロジェクトディレクトリがある場合はアプリを起動し、ない場合はメッセージを出して待機
+    command: >
+      sh -c 
+        "if [ -e $API_PROJ_NAME/package.json ]; then 
+          cd $API_PROJ_NAME && yarn install && yarn start:dev
+        else
+          echo 'Project Directory is not found...' && tail -f /dev/null
+        fi"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:12-alpine
+    restart: always
+    environment:
+      TZ: Asia/Tokyo
+      POSTGRES_DB: $DB_NAME
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASS
+    volumes:
+      - db_store:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+volumes:
+  db_store:
+  front_store:
+  api_store:
