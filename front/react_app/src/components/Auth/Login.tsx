@@ -3,9 +3,10 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { ReactNode, useState } from "react";
 import styled from "styled-components";
+import axios from "axios";
 
 type LoginForm = {
-  userid: string;
+  email: string;
   password: string;
 };
 
@@ -21,9 +22,9 @@ function Login() {
   const onSubmit = async (data: LoginForm) => {
     console.log(data);
     axios
-      .get("http://192.168.56.1:3001/api/login", {
-        params: {
-          userid: data.userid,
+      .post("http://127.0.0.1:3000/auth/login", {
+        body: {
+          email: data.email,
           password: data.password,
         },
       })
@@ -31,7 +32,7 @@ function Login() {
         if (response.data.status) {
           alert("login success!!");
           console.log(response.data.token);
-          window.localStorage.setItem(data.userid, response.data.token);
+          window.localStorage.setItem(data.email, response.data.token);
           navigate("/home");
         } else {
           setErrorMsg("ユーザー名またはパスワードが違います");
@@ -128,11 +129,11 @@ function Login() {
         <label>
           <InputUserInfo
             type="text"
-            {...register("userid", { required: "ユーザーIDを入力してください。" })}
+            {...register("email", { required: "ユーザーIDを入力してください。" })}
             placeholder="example@raft-works.com"
           />
         </label>
-        <ErrorMessages>{errors.userid?.message as ReactNode}</ErrorMessages>
+        <ErrorMessages>{errors.email?.message as ReactNode}</ErrorMessages>
         <label>
           <InputUserInfo
             type="password"

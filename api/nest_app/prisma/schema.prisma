@@ -2,61 +2,18 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model User {
-  id                Int                   @id @default(autoincrement()) @map("user_id")
-  name              String?               @db.VarChar(256)
-  email             String                @unique @db.VarChar(256)
-  password          String                @db.VarChar(256)
-  messages          Message[]
-  profiles          Profile?
-  created_at        DateTime?             @default(now()) @db.Timestamptz(6)
-  update_at         DateTime?             @default(now()) @db.Timestamptz(6)
-
-  @@map("users")
-}
-
-model Message {
-  id            Int                  @id @default(autoincrement()) @map("message_id")
-  created_at            DateTime?            @default(now()) @db.Timestamptz(6)
-  content               String?
-  author_id             Int?
-  users                 User?                @relation(fields: [author_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  message_in_rooms      MessageInRooms[]
-
-  @@map("messages")
-}
-
-model Profile {
-  id         Int     @id @default(autoincrement()) @map("profile_id")
-  bio        String?
-  user_id    Int     @unique
-  users      User    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@map("profiles")
-}
-
-model Room {
-  id                 Int                  @id @default(autoincrement()) @map("room_id")
-  name               String?              @db.VarChar(256)
-  message_in_rooms   MessageInRooms[]
-
-  @@map("rooms")
-}
-
-model MessageInRooms {
-  message_id     Int
-  room_id        Int
-  rooms          Room       @relation(fields: [room_id], references:[id], onDelete: NoAction, onUpdate: NoAction)
-  messages       Message    @relation(fields: [message_id], references:[id], onDelete: NoAction, onUpdate: NoAction)
-
-  @@unique([message_id, room_id], map: "message_id_room_id_unique")
-  @@map("message_in_rooms")
+    id             Int      @id @default(autoincrement())
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+    email          String   @unique
+    hashedPassword String
 }
