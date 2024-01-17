@@ -13,9 +13,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('/login')
-  async login(
-    @Body() postData: { email: string; password: string },
-  ): Promise<any> {
+  async login(@Body() postData: { email: string; password: string }): Promise<any> {
     return await this.authService.login(postData);
   }
 }

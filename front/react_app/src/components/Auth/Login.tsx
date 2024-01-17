@@ -1,9 +1,9 @@
-import React from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { ReactNode, useState } from "react";
-import styled from "styled-components";
+import { Container, InputUserInfo, Form, ErrorMessages, PasswordResetLink, LoginButton } from "../styles/Login.style";
 import axios from "axios";
+// import qs from "qs";
 
 type LoginForm = {
   email: string;
@@ -21,105 +21,52 @@ function Login() {
 
   const onSubmit = async (data: LoginForm) => {
     console.log(data);
+    // axios
+    //   .post("http://127.0.0.1:3000/auth/login", {
+    //     body: {
+    //       email: data.email,
+    //       password: data.password,
+    //     },
+    //   })
+    //   .then((response) => {
+    //     if (response.data.status) {
+    //       alert("login success!!");
+    //       console.log(response.data.token);
+    //       window.localStorage.setItem(data.email, response.data.token);
+    //       navigate("/home");
+    //     } else {
+    //       setErrorMsg("ユーザー名またはパスワードが違います");
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     alert(`予期せぬエラーが発生しました。${error}`);
+    //   });
+
+    // const queryData = qs.stringify({
+    //   email: data.email,
+    //   password: data.password,
+    // });
+
+    const config = {
+      method: "post",
+      maxBodyLength: Infinity,
+      url: "http://127.0.0.1:3000/auth/login",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      data: { email: data.email, password: data.password },
+    };
     axios
-      .post("http://127.0.0.1:3000/auth/login", {
-        body: {
-          email: data.email,
-          password: data.password,
-        },
-      })
+      .request(config)
       .then((response) => {
-        if (response.data.status) {
-          alert("login success!!");
-          console.log(response.data.token);
-          window.localStorage.setItem(data.email, response.data.token);
-          navigate("/home");
-        } else {
-          setErrorMsg("ユーザー名またはパスワードが違います");
-        }
+        console.log(JSON.stringify(response.data));
+        window.localStorage.setItem("accessToken", JSON.stringify(response.data));
       })
       .catch((error) => {
-        alert(`予期せぬエラーが発生しました。${error}`);
+        console.log(error);
+        setErrorMsg("ログイン失敗");
       });
   };
-
-  //スタイル定義
-
-  const InputUserInfo = styled.input`
-    text-align: left;
-    width: 200px;
-    padding: 10px;
-    margin-bottom: 5px;
-    border: 2px solid #007bff; /* 鮮やかなボーダー色 */
-    border-radius: 8px; /* 角丸 */
-    background-color: #f0f8ff; /* 明るい背景色 */
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* 影の追加 */
-    display: flex;
-
-    &:focus {
-      border-color: #ff4500; /* フォーカス時にボーダー色を変更 */
-      box-shadow: 0 0 8px rgba(255, 69, 0, 0.6); /* フォーカス時に影を強調 */
-      outline: none; /* デフォルトのアウトラインを削除 */
-    }
-
-    &:hover {
-      background-color: #e0ffff; /* ホバー時の背景色変更 */
-    }
-  `;
-
-  const LoginButton = styled.button`
-    width: 210px;
-    padding: 10px;
-    margin-top: 10px;
-    background-color: #007bff; /* ボタンの背景色 */
-    color: white; /* テキストの色 */
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease; /* トランジション効果 */
-
-    &:hover {
-      background-color: #0056b3; /* ホバー時の背景色変更 */
-    }
-  `;
-
-  const Container = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 98vh;
-    background-size: 100%;
-    background-image: url(https://images4.alphacoders.com/132/1321259.png); /* 背景色 */
-  `;
-
-  const Form = styled.form`
-    padding: 20px;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    align-items: center;
-    justify-content: center;
-  `;
-
-  const PasswordResetLink = styled.a`
-    max-width: 78px;
-    font-size: 8px;
-    color: blue;
-    display: flex;
-    text-decoration: underline;
-
-    &:hover {
-      color: red;
-    }
-  `;
-
-  const ErrorMessages = styled.p`
-    font-size: 8px;
-    color: red;
-    display: flex;
-  `;
 
   return (
     <Container>
