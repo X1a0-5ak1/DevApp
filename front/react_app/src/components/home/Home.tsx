@@ -1,11 +1,10 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 
-function Home() {
+export default function Home() {
   const navigate = useNavigate();
 
   const LogoutAction = () => {
-    localStorage.clear();
+    window.localStorage.clear();
     navigate("/login");
   };
 
@@ -20,4 +19,3 @@ function Home() {
     </>
   );
 }
-export default Home;

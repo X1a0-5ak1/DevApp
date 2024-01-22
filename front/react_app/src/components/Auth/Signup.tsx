@@ -1,57 +1,44 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { ReactNode, useState } from "react";
-import { Container, InputUserInfo, Form, ErrorMessages, NavigateLink, SubmitButton } from "../styles/AuthForm.style";
+import {
+  Container,
+  InputUserInfo,
+  Form,
+  ErrorMessages,
+  NavigateLink,
+  SubmitButton,
+  PasswordReveal,
+} from "../styles/AuthForm.style";
 import axios, { isAxiosError } from "axios";
-// import React from "react";
 // import qs from "qs";
 
-type LoginForm = {
+type SignUpForm = {
   email: string;
   password: string;
 };
 
-export default function Login() {
+export default function SignUp() {
   const navigate = useNavigate();
   const [errorMsg, setErrorMsg] = useState("");
+  const [isRevealPassword, setIsRevealPassword] = useState(false);
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginForm>({ mode: "onChange" });
+  } = useForm<SignUpForm>({ mode: "onChange" });
 
-  const onSubmit = async (data: LoginForm) => {
+  const togglePassword = () => {
+    setIsRevealPassword((prevState) => !prevState);
+  };
+
+  const onSubmit = async (data: SignUpForm) => {
     console.log(data);
-    // axios
-    //   .post("http://127.0.0.1:3000/auth/login", {
-    //     body: {
-    //       email: data.email,
-    //       password: data.password,
-    //     },
-    //   })
-    //   .then((response) => {
-    //     if (response.data.status) {
-    //       alert("login success!!");
-    //       console.log(response.data.token);
-    //       window.localStorage.setItem(data.email, response.data.token);
-    //       navigate("/home");
-    //     } else {
-    //       setErrorMsg("ユーザー名またはパスワードが違います");
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     alert(`予期せぬエラーが発生しました。${error}`);
-    //   });
-
-    // const queryData = qs.stringify({
-    //   email: data.email,
-    //   password: data.password,
-    // });
 
     const config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: "http://127.0.0.1:3000/auth/login",
+      url: "http://127.0.0.1:3000/auth/signUp",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -61,15 +48,11 @@ export default function Login() {
       .request(config)
       .then((response) => {
         console.log(JSON.stringify(response.data));
-        window.localStorage.setItem("accessToken", JSON.stringify(response.data));
       })
       .catch((error) => {
         if (isAxiosError(error) && error.response && error.response.status === 403) {
           console.log(error);
-          setErrorMsg("Emailまたはパスワードが違います");
-        } else {
-          console.log(error);
-          setErrorMsg("予期せぬエラーが発生しました");
+          setErrorMsg("登録済みのEmailです");
         }
       });
   };
@@ -77,7 +60,7 @@ export default function Login() {
   return (
     <Container>
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <h2>Login</h2>
+        <h2>Sign Up</h2>
         <ErrorMessages>{errorMsg}</ErrorMessages>
         <label>
           <InputUserInfo
@@ -89,26 +72,23 @@ export default function Login() {
         <ErrorMessages>{errors.email?.message as ReactNode}</ErrorMessages>
         <label>
           <InputUserInfo
-            type="password"
+            type={isRevealPassword ? "text" : "password"}
             {...register("password", { required: "パスワードを入力してください。" })}
             placeholder="Enter Password"
           />
+          <PasswordReveal onClick={togglePassword} role="presentation">
+            {isRevealPassword ? <i className="fas fa-eye" /> : <i className="fas fa-eye-slash" />}
+          </PasswordReveal>
         </label>
         <ErrorMessages>{errors.password?.message as ReactNode}</ErrorMessages>
         <NavigateLink
           onClick={() => {
-            navigate("/passwordreset");
+            navigate("/login");
           }}>
-          Forgot Password...?
-        </NavigateLink>
-        <NavigateLink
-          onClick={() => {
-            navigate("/signup");
-          }}>
-          Create your Account!!
+          Go to Login!!
         </NavigateLink>
         <SubmitButton type="submit" onSubmit={handleSubmit(onSubmit)}>
-          Login
+          Create User
         </SubmitButton>
       </Form>
     </Container>

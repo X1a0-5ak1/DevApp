@@ -22,7 +22,7 @@ export const InputUserInfo = styled.input`
   }
 `;
 
-export const LoginButton = styled.button`
+export const SubmitButton = styled.button`
   width: 210px;
   padding: 10px;
   margin-top: 10px;
@@ -45,7 +45,7 @@ export const Container = styled.div`
   justify-content: center;
   height: 98vh;
   background-size: 100%;
-  background-image: url(https://images4.alphacoders.com/132/1321259.png); /* 背景色 */
+  background-image: url("https://www.icegif.com/wp-content/uploads/2023/05/icegif.gif"); /* 背景 */
 `;
 
 export const Form = styled.form`
@@ -58,7 +58,7 @@ export const Form = styled.form`
   justify-content: center;
 `;
 
-export const PasswordResetLink = styled.a`
+export const NavigateLink = styled.a`
   max-width: 78px;
   font-size: 8px;
   color: blue;
@@ -74,4 +74,11 @@ export const ErrorMessages = styled.p`
   font-size: 8px;
   color: red;
   display: flex;
+`;
+
+export const PasswordReveal = styled.span`
+  left: auto;
+  position: absolute;
+  right: 10px;
+  top: 10px;
 `;

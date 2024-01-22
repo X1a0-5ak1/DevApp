@@ -1,4 +1,4 @@
-FROM node:21-alpine3.19
+FROM node:20-alpine3.19
 ARG API_WORKDIR
 WORKDIR ${API_WORKDIR}
 ENV TZ Asia/Tokyo
