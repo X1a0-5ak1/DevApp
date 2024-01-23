@@ -22,31 +22,6 @@ export default function Login() {
 
   const onSubmit = async (data: LoginForm) => {
     console.log(data);
-    // axios
-    //   .post("http://127.0.0.1:3000/auth/login", {
-    //     body: {
-    //       email: data.email,
-    //       password: data.password,
-    //     },
-    //   })
-    //   .then((response) => {
-    //     if (response.data.status) {
-    //       alert("login success!!");
-    //       console.log(response.data.token);
-    //       window.localStorage.setItem(data.email, response.data.token);
-    //       navigate("/home");
-    //     } else {
-    //       setErrorMsg("ユーザー名またはパスワードが違います");
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     alert(`予期せぬエラーが発生しました。${error}`);
-    //   });
-
-    // const queryData = qs.stringify({
-    //   email: data.email,
-    //   password: data.password,
-    // });
 
     const config = {
       method: "post",
@@ -72,6 +47,10 @@ export default function Login() {
           setErrorMsg("予期せぬエラーが発生しました");
         }
       });
+
+    if (window.localStorage.getItem("accessToken")) {
+      navigate("/home");
+    }
   };
 
   return (

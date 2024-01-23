@@ -59,7 +59,7 @@ export const Form = styled.form`
 `;
 
 export const NavigateLink = styled.a`
-  max-width: 78px;
+  max-width: auto;
   font-size: 8px;
   color: blue;
   display: flex;

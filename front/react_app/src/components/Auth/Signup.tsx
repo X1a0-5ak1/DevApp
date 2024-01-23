@@ -38,7 +38,7 @@ export default function SignUp() {
     const config = {
       method: "post",
       maxBodyLength: Infinity,
-      url: "http://127.0.0.1:3000/auth/signUp",
+      url: "http://127.0.0.1:3000/auth/signup",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -48,6 +48,7 @@ export default function SignUp() {
       .request(config)
       .then((response) => {
         console.log(JSON.stringify(response.data));
+        alert(`登録完了:${response.data.message}`);
       })
       .catch((error) => {
         if (isAxiosError(error) && error.response && error.response.status === 403) {
