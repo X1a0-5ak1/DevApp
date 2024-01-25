@@ -47,8 +47,8 @@ export default function SignUp() {
     axios
       .request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
-        alert(`登録完了:${response.data.message}`);
+        console.log(JSON.parse(response.data));
+        alert(`登録完了:${JSON.parse(response.data.message)}`);
       })
       .catch((error) => {
         if (isAxiosError(error) && error.response && error.response.status === 403) {

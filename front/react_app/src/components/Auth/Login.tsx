@@ -1,4 +1,4 @@
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { ReactNode, useState } from "react";
 import { Container, InputUserInfo, Form, ErrorMessages, NavigateLink, SubmitButton } from "../styles/AuthForm.style";
@@ -13,16 +13,19 @@ type LoginForm = {
 
 export default function Login() {
   const navigate = useNavigate();
-  const [errorMsg, setErrorMsg] = useState("");
+  const [errorMsg, setErrorMsg] = useState(""); // エラーメッセージ配置用
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<LoginForm>({ mode: "onChange" });
 
-  const onSubmit = async (data: LoginForm) => {
+  // ログインボタン押下時の処理
+  const onSubmit: SubmitHandler<LoginForm> = (data) => {
     console.log(data);
 
+    // API側ログイン処理
     const config = {
       method: "post",
       maxBodyLength: Infinity,
@@ -35,8 +38,9 @@ export default function Login() {
     axios
       .request(config)
       .then((response) => {
-        console.log(JSON.stringify(response.data));
-        window.localStorage.setItem("accessToken", JSON.stringify(response.data));
+        console.log(JSON.parse(response.data));
+        localStorage.setItem("accessToken", JSON.parse(response.data.accessToken));
+        navigate("/home");
       })
       .catch((error) => {
         if (isAxiosError(error) && error.response && error.response.status === 403) {
@@ -47,10 +51,7 @@ export default function Login() {
           setErrorMsg("予期せぬエラーが発生しました");
         }
       });
-
-    if (window.localStorage.getItem("accessToken")) {
-      navigate("/home");
-    }
+    reset();
   };
 
   return (
