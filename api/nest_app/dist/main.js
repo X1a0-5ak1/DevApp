@@ -6,7 +6,10 @@ async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.enableCors({
         origin: '*',
-        allowedHeaders: 'Origin, X-Reqested-with, Content-Type, Accept',
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'Authorization'],
+        exposedHeaders: ['Authorization'],
+        credentials: true,
     });
     await app.listen(3000);
 }

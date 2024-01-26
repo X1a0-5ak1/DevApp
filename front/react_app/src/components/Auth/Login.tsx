@@ -38,8 +38,9 @@ export default function Login() {
     axios
       .request(config)
       .then((response) => {
-        console.log(JSON.parse(response.data));
-        localStorage.setItem("accessToken", JSON.parse(response.data.accessToken));
+        console.log(response.data);
+        window.localStorage.setItem("accessToken", response.data.accessToken);
+        window.localStorage.setItem("email", data.email);
         navigate("/home");
       })
       .catch((error) => {
