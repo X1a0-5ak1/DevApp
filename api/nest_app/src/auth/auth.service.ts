@@ -14,6 +14,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
+  // ユーザー作成
   async signUp(postData): Promise<Msg> {
     const hashed = await bcrypt.hash(postData.password, 12);
     try {
@@ -33,6 +34,7 @@ export class AuthService {
     }
   }
 
+  // ログイン認証
   async login(postData) {
     const user = await this.prismaService.user.findUnique({
       where: { email: postData.email },
@@ -43,6 +45,9 @@ export class AuthService {
     return this.generateJwt(user.id, user.email);
   }
 
+  // パスワード変更(余力で)
+
+  // トークン作成
   async generateJwt(userId: number, email: string): Promise<Jwt> {
     const payload = {
       sub: userId,
