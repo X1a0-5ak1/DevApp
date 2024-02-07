@@ -13,7 +13,7 @@ type LoginForm = {
 
 export default function Login() {
   const navigate = useNavigate();
-  const [errorMsg, setErrorMsg] = useState(""); // エラーメッセージ配置用
+  const [errorMsg, setErrorMsg] = useState(""); //エラーメッセージ配置用
   const {
     register,
     handleSubmit,
@@ -21,11 +21,9 @@ export default function Login() {
     formState: { errors },
   } = useForm<LoginForm>({ mode: "onChange" });
 
-  // ログインボタン押下時の処理
   const onSubmit: SubmitHandler<LoginForm> = (data) => {
     console.log(data);
 
-    // API側ログイン処理
     const config = {
       method: "post",
       maxBodyLength: Infinity,
@@ -38,8 +36,8 @@ export default function Login() {
     axios
       .request(config)
       .then((response) => {
-        console.log(response.data);
-        window.localStorage.setItem("accessToken", response.data.accessToken);
+        console.log(JSON.stringify(response.data));
+        window.localStorage.setItem("accessToken", JSON.stringify(response.data.accessToken));
         window.localStorage.setItem("email", data.email);
         navigate("/home");
       })

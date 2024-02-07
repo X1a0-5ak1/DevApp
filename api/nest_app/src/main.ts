@@ -8,11 +8,10 @@ async function bootstrap() {
     // cors設定
     origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'Authorization'],
+    allowedHeaders: ['Origin, X-Reqested-with, Content-Type, Accept', 'Authorization'],
     exposedHeaders: ['Authorization'],
     credentials: true,
   });
-
   await app.listen(3000);
 }
 bootstrap();
