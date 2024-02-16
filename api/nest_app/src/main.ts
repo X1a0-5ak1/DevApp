@@ -12,6 +12,7 @@ async function bootstrap() {
     exposedHeaders: ['Authorization'],
     credentials: true,
   });
+
   await app.listen(3000);
 }
 bootstrap();

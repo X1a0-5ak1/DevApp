@@ -17,3 +17,10 @@ model User {
   email          String   @unique
   hashedPassword String
 }
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  user_Id   Int
+  createdAt DateTime @default(now())
+  content   String
+}

@@ -38,7 +38,7 @@ export default function Login() {
       .then((response) => {
         console.log(JSON.stringify(response.data));
         window.localStorage.setItem("accessToken", response.data.accessToken);
-        window.localStorage.setItem("email", data.email);
+        window.localStorage.setItem("loginUserEmail", data.email);
         navigate("/home");
       })
       .catch((error) => {
