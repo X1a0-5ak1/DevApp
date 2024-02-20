@@ -8,18 +8,61 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Gateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
-const messages_service_1 = require("./messages.service");
+const prisma_service_1 = require("../prisma/prisma.service");
 let Gateway = class Gateway {
-    constructor(messagesService) {
-        this.messagesService = messagesService;
+    constructor(prismaService) {
+        this.prismaService = prismaService;
     }
-    async onNewMessage(client, payload) {
-        const message = await this.messagesService.create(payload.content, payload.user_Id);
-        this.server.emit('onMessage', message);
+    onModuleInit() {
+        this.server.on('connection', (socket) => {
+            console.log(socket.id);
+            console.log('connected!');
+        });
+    }
+    async onLoadMessage() {
+        const messageHistories = await this.prismaService.message.findMany({
+            orderBy: {
+                createdAt: 'desc',
+            },
+            take: 50,
+        });
+        console.log(messageHistories);
+        this.server.emit('onMessage', {
+            messageHistories,
+            msg: 'Load latest 50',
+        });
+    }
+    async onNewMessage(body, user_Id) {
+        console.log(body);
+        try {
+            this.prismaService.message.create({
+                data: {
+                    user_Id: user_Id,
+                    content: body,
+                },
+            });
+        }
+        catch (error) {
+            console.log(error);
+        }
+        const loadMessage = await this.prismaService.message.findMany({
+            where: {
+                user_Id: user_Id,
+                content: body,
+            },
+        });
+        console.log(loadMessage);
+        this.server.emit('onMessage', {
+            loadMessage,
+            msg: 'New Message',
+        });
     }
 };
 exports.Gateway = Gateway;
@@ -28,9 +71,16 @@ __decorate([
     __metadata("design:type", socket_io_1.Server)
 ], Gateway.prototype, "server", void 0);
 __decorate([
-    (0, websockets_1.SubscribeMessage)('newMessage'),
+    (0, websockets_1.SubscribeMessage)('loadMessage'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], Gateway.prototype, "onLoadMessage", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('newMessage'),
+    __param(0, (0, websockets_1.MessageBody)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Number]),
     __metadata("design:returntype", Promise)
 ], Gateway.prototype, "onNewMessage", null);
 exports.Gateway = Gateway = __decorate([
@@ -39,6 +89,6 @@ exports.Gateway = Gateway = __decorate([
             origin: '*',
         },
     }),
-    __metadata("design:paramtypes", [messages_service_1.MessagesService])
+    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
 ], Gateway);
 //# sourceMappingURL=gateway.js.map

@@ -9,14 +9,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.GatewayModule = void 0;
 const common_1 = require("@nestjs/common");
 const gateway_1 = require("./gateway");
-const messages_service_1 = require("./messages.service");
-const prisma_service_1 = require("../prisma/prisma.service");
 let GatewayModule = class GatewayModule {
 };
 exports.GatewayModule = GatewayModule;
 exports.GatewayModule = GatewayModule = __decorate([
     (0, common_1.Module)({
-        providers: [gateway_1.Gateway, messages_service_1.MessagesService, prisma_service_1.PrismaService],
+        providers: [gateway_1.Gateway],
     })
 ], GatewayModule);
 //# sourceMappingURL=gateway.module.js.map

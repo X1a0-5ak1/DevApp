@@ -1,20 +1,29 @@
 import { useNavigate } from "react-router-dom";
 import axios, { isAxiosError } from "axios";
-import { useContext, useEffect, useState } from "react";
+import { ReactNode, useContext, useEffect, useState } from "react";
 import { WebsocketContext } from "../contexts/WebsocketContext";
+import { HeaderItems, ActionButton, ErrorMessages } from "./styles/ChatForm.style";
+import { SubmitHandler, useForm } from "react-hook-form";
 
 type MessagePayload = {
   content: string;
   msg: string;
+  user_Id: number;
+  createdAt: Date;
 };
 
 export default function Home() {
-  const [value, setValue] = useState("");
   const [messages, setMessages] = useState<MessagePayload[]>([]);
   const socket = useContext(WebsocketContext);
   const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<MessagePayload>({ mode: "onChange" });
 
-  // サーバー側からデータの取得
+  // イベントの受信
   useEffect(() => {
     socket.on("onMessage", (newMessage: MessagePayload) => {
       setMessages((prev) => [...prev, newMessage]);
@@ -26,23 +35,9 @@ export default function Home() {
     };
   });
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        const response = await axios.get("http://127.0.0.1:3000/messages");
-        setMessages(response.data);
-      } catch (error) {
-        console.error("メッセージの取得に失敗しました。", error);
-      }
-    };
-
-    fetchMessages();
-  }, []);
-
   // メッセージの送信
-  const onSubmit = () => {
-    socket.emit("newMessage", value);
-    setValue("");
+  const onSubmit: SubmitHandler<MessagePayload> = (data) => {
+    socket.emit("newMessage", data.msg);
   };
 
   // ログアウト
@@ -52,20 +47,28 @@ export default function Home() {
   };
 
   // ログイン確認
-  const config = {
-    method: "get",
-    maxBodyLength: Infinity,
-    url: "http://127.0.0.1:3000/user",
-    headers: {
-      Authorization: `Bearer ${window.localStorage.getItem("accessToken")}`,
-    },
-  };
-
   useEffect(() => {
+    const config = {
+      method: "get",
+      maxBodyLength: Infinity,
+      url: "http://127.0.0.1:3000/user",
+      headers: {
+        Authorization: `Bearer ${window.localStorage.getItem("accessToken")}`,
+      },
+    };
     axios
       .request(config)
       .then((response) => {
         console.log(JSON.stringify(response.data) + "¥n" + "ログイン成功です。");
+        window.localStorage.setItem("user_Id", response.data.id);
+        socket.on("loadMessage", (newMessage: MessagePayload) => {
+          setMessages((prev) => [...prev, newMessage]);
+        });
+
+        return () => {
+          socket.off("connect");
+          socket.off("loadMessage");
+        };
       })
       .catch((error) => {
         if (isAxiosError(error) && error.response && error.response.status === 401) {
@@ -75,16 +78,18 @@ export default function Home() {
           console.log("予期せぬエラーが発生しました。");
         }
       });
-  }, []);
+    reset();
+  });
 
   return (
     <div>
+      <HeaderItems>
+        <p>ようこそ「{`${window.localStorage.getItem("loginUserEmail")}`}」さん</p>
+        <ActionButton onClick={LogoutAction}>logout</ActionButton>
+      </HeaderItems>
       <div>
         <h1>チャットアプリ(仮)</h1>
-        <div>
-          <p>ようこそ「{`${window.localStorage.getItem("loginUserEmail")}`}」さん</p>
-          <button onClick={LogoutAction}>logout</button>
-        </div>
+
         <div>
           {messages.length === 0 ? (
             <div>未だメッセージがありません。</div>
@@ -98,9 +103,17 @@ export default function Home() {
             </div>
           )}
         </div>
+
         <div>
-          <input type="text" value={value} onChange={(e) => setValue(e.target.value)} />
-          <button onClick={onSubmit}>Submit</button>
+          <input
+            type="text"
+            {...register("msg", { required: "メッセージを入力してください" })}
+            placeholder="メッセージを入力"
+          />
+          <ErrorMessages>{errors.msg?.message as ReactNode}</ErrorMessages>
+          <button type="submit" onClick={handleSubmit(onSubmit)}>
+            Submit
+          </button>
         </div>
       </div>
     </div>

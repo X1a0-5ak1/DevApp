@@ -1,11 +1,11 @@
+import { OnModuleInit } from '@nestjs/common';
 import { Server } from 'socket.io';
-import { MessagesService } from './messages.service';
-export declare class Gateway {
-    private messagesService;
+import { PrismaService } from 'src/prisma/prisma.service';
+export declare class Gateway implements OnModuleInit {
+    private readonly prismaService;
+    constructor(prismaService: PrismaService);
     server: Server;
-    constructor(messagesService: MessagesService);
-    onNewMessage(client: any, payload: {
-        content: string;
-        user_Id: number;
-    }): Promise<void>;
+    onModuleInit(): void;
+    onLoadMessage(): Promise<void>;
+    onNewMessage(body: any, user_Id: number): Promise<void>;
 }
